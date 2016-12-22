@@ -265,9 +265,6 @@ on boot
 
     chown root system /proc/net/ip_conntrack
 
-    # Enable DEBUG_SUSPEND, DEBUG_EXIT_SUSPEND, and DEBUG_WAKEUP
-    write /sys/module/wakelock/parameters/debug_mask 7
-
     chown system wifi /sys/module/bcmdhd/parameters/firmware_path
     chmod 0640 /sys/module/bcmdhd/parameters/firmware_path
 
@@ -333,20 +330,16 @@ service irsc_util /system/bin/irsc_util "/etc/sec_config"
     user root
     oneshot
 
-service loc_launcher /system/bin/loc_launcher
-    class late_start
-    group gps inet net_raw qcom_diag net_admin wifi
-
 service mpdecision /system/bin/mpdecision --avg_comp
    class late_start
    user root
-   group root system
+   group root system readproc
    disabled
 
 service netmgrd /system/bin/netmgrd
     class main
     user root
-    group radio
+    group radio wakelock
 
 service qcamerasvr /system/bin/mm-qcamera-daemon
     class late_start
@@ -356,7 +349,7 @@ service qcamerasvr /system/bin/mm-qcamera-daemon
 service qmuxd /system/bin/qmuxd
     class main
     user radio
-    group radio audio bluetooth gps qcom_diag
+    group radio audio bluetooth wakelock gps qcom_diag
 
 service qseecomd /system/bin/qseecomd
     class core
@@ -366,12 +359,12 @@ service qseecomd /system/bin/qseecomd
 service rmt_storage /system/bin/rmt_storage
     class core
     user root
-    group system
+    group system wakelock
 
 service sensors /system/bin/sensors.qcom
     class late_start
     user root
-    group root
+    group root wakelock
 
 service set_baseband /system/bin/sh /system/etc/set_baseband.sh
     class late_start
@@ -407,6 +400,7 @@ service p2p_supplicant /system/bin/wpa_supplicant \
     #   group wifi inet keystore
     class main
     socket wpa_wlan0 dgram 660 wifi wifi
+    group system wakelock
     disabled
     oneshot
 
@@ -420,6 +414,7 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     #   group wifi inet keystore
     class main
     socket wpa_wlan0 dgram 660 wifi wifi
+    group system wakelock
     disabled
     oneshot
 
